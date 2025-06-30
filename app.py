@@ -290,10 +290,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def extract_youtube_script(text):
-    # 1. '동영상에서 검색' 이후 텍스트만 가져오기
-    parts = re.split(r"동영상에서\s*검색", text, maxsplit=1)
+    # 1. '스크립트\nIntroduction' 이후 텍스트만 가져오기
+    parts = re.split(r"스크립트\s*[\r\n]+Introduction", text, maxsplit=1)
     if len(parts) < 2:
-        return None, "'동영상에서 검색' 키워드를 찾을 수 없습니다."
+        return None, "'스크립트\nIntroduction' 키워드를 찾을 수 없습니다."
     after_search = parts[1]
 
     # 2. '모두' 나오기 전까지 자르기
@@ -311,6 +311,12 @@ def extract_youtube_script(text):
         # 영문자 포함, 한글/한자 미포함 문장만
         if re.search(r"[a-zA-Z]", line) and not re.search(r"[가-힣\u4e00-\u9fff]", line):
             english_lines.append(line)
+
+    # 4. 결과 반환
+    result = "\n".join(english_lines).strip()
+    if not result:
+        return None, "스크립트 내 영어 문장을 찾을 수 없습니다."
+    return result, None
 
     # 4. 결과 반환
     result = "\n".join(english_lines).strip()
