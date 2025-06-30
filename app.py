@@ -289,20 +289,20 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-def extract_youtube_script(text):
-    # 1. '스크립트\nIntroduction' 이후 텍스트만 가져오기
-    parts = re.split(r"스크립트\s*[\r\n]+Introduction", text, maxsplit=1)
+def extract_youtube_script(text, start_word, end_word):
+    # 1. 시작 단어 이후 텍스트만 가져오기
+    parts = re.split(re.escape(start_word), text, maxsplit=1)
     if len(parts) < 2:
-        return None, "'스크립트\nIntroduction' 키워드를 찾을 수 없습니다."
-    after_search = parts[1]
+        return None, f"'{start_word}' 키워드를 찾을 수 없습니다."
+    after_start = parts[1]
 
-    # 2. '모두' 나오기 전까지 자르기
-    idx = after_search.find("모두")
+    # 2. 끝 단어 나오기 전까지 자르기
+    idx = after_start.find(end_word)
     if idx != -1:
-        after_search = after_search[:idx]
+        after_start = after_start[:idx]
 
     # 3. 영어 문장만 필터링 (한글/한자 포함 문장 제외)
-    lines = after_search.splitlines()
+    lines = after_start.splitlines()
     english_lines = []
     for line in lines:
         line = line.strip()
@@ -311,12 +311,6 @@ def extract_youtube_script(text):
         # 영문자 포함, 한글/한자 미포함 문장만
         if re.search(r"[a-zA-Z]", line) and not re.search(r"[가-힣\u4e00-\u9fff]", line):
             english_lines.append(line)
-
-    # 4. 결과 반환
-    result = "\n".join(english_lines).strip()
-    if not result:
-        return None, "스크립트 내 영어 문장을 찾을 수 없습니다."
-    return result, None
 
     # 4. 결과 반환
     result = "\n".join(english_lines).strip()
@@ -336,6 +330,10 @@ with st.container():
             <p class="subtitle">고급 AI 기술로 텍스트에서 스크립트를 추출하고 지능적으로 요약하는 프리미엄 솔루션</p>
         </div>
     """, unsafe_allow_html=True)
+
+    # 시작/끝 단어 입력 받기
+    start_word = st.text_input("시작 단어를 입력하세요", value="동영상에서 검색")
+    end_word = st.text_input("끝 단어를 입력하세요", value="모두")
 
     # 입력 섹션
     st.markdown("""
@@ -375,7 +373,7 @@ with st.container():
         </div>
         """, unsafe_allow_html=True)
         
-        script_text, error = extract_youtube_script(user_text)
+        script_text, error = extract_youtube_script(user_text, start_word, end_word)
         
         if error:
             st.markdown(f"""
@@ -390,6 +388,8 @@ with st.container():
             </div>
             """, unsafe_allow_html=True)
             
+            # (생략: split_text 함수 및 나머지 UI 출력, AI 요약 부분 동일)
+
             # 분할 함수 정의
             def split_text(text):
                 chunks = []
