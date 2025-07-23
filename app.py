@@ -319,8 +319,8 @@ def extract_youtube_script(text, start_word, end_word):
     return result, None
 
 # 여기에 슬라이더 추가
-max_chars_english = st.slider("영문 텍스트 최대 글자 수", min_value=1000, max_value=30000, value=12000, step=500)
-max_chars_non_english = st.slider("한글/한자 포함 텍스트 최대 글자 수", min_value=1000, max_value=30000, value=10000, step=500)
+max_chars_english = st.slider("영문 텍스트 최대 글자 수", min_value=1000, max_value=30000, value=24000, step=1000)
+max_chars_non_english = st.slider("한글/한자 포함 텍스트 최대 글자 수", min_value=1000, max_value=30000, value=10000, step=1000)
 
 
 # 플로팅 엘리먼트
