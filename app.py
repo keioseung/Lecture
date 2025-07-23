@@ -396,7 +396,7 @@ with st.container():
                 start = 0
                 length = len(text)
                 while start < length:
-                    segment = text[start:start+30000]
+                    segment = text[start:start+12000]
                     if re.search(r"[가-힣\u4e00-\u9fff\u3040-\u309F\u30A0-\u30FF]", segment):
                         segment = text[start:start+10000]
                     chunks.append(segment)
