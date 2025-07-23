@@ -318,11 +318,6 @@ def extract_youtube_script(text, start_word, end_word):
         return None, "스크립트 내 영어 문장을 찾을 수 없습니다."
     return result, None
 
-# 시작/끝 단어 입력 받기 바로 아래
-
-start_word = st.text_input("시작 단어를 입력하세요", value="동영상에서 검색")
-end_word = st.text_input("끝 단어를 입력하세요", value="모두")
-
 # 여기에 슬라이더 추가
 max_chars_english = st.slider("영문 텍스트 최대 글자 수", min_value=1000, max_value=20000, value=12000, step=500)
 max_chars_non_english = st.slider("한글/한자 포함 텍스트 최대 글자 수", min_value=1000, max_value=20000, value=10000, step=500)
