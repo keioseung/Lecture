@@ -301,26 +301,28 @@ def extract_youtube_script(text, start_word, end_word):
     if idx != -1:
         after_start = after_start[:idx]
 
-    # 3. 영어 문장만 필터링 (한글/한자 포함 문장 제외)
+    # 3. 다국어 문장 필터링 (한국어, 일본어, 중국어, 영어 모두 포함)
     lines = after_start.splitlines()
-    english_lines = []
+    multilingual_lines = []
     for line in lines:
         line = line.strip()
         if not line:
             continue
-        # 영문자 포함, 한글/한자 미포함 문장만
-        if re.search(r"[a-zA-Z]", line) and not re.search(r"[가-힣\u4e00-\u9fff]", line):
-            english_lines.append(line)
+        # 한국어, 일본어, 중국어, 영어 중 하나라도 포함된 문장
+        if (re.search(r"[가-힣]", line) or  # 한국어
+            re.search(r"[\u4e00-\u9fff]", line) or  # 중국어
+            re.search(r"[\u3040-\u309F\u30A0-\u30FF]", line) or  # 일본어 (히라가나, 가타카나)
+            re.search(r"[a-zA-Z]", line)):  # 영어
+            multilingual_lines.append(line)
 
     # 4. 결과 반환
-    result = "\n".join(english_lines).strip()
+    result = "\n".join(multilingual_lines).strip()
     if not result:
-        return None, "스크립트 내 영어 문장을 찾을 수 없습니다."
+        return None, "스크립트 내 다국어 문장을 찾을 수 없습니다."
     return result, None
 
 # 여기에 슬라이더 추가
-max_chars_english = st.slider("영문 텍스트 최대 글자 수", min_value=1000, max_value=30000, value=24000, step=1000)
-max_chars_non_english = st.slider("한글/한자 포함 텍스트 최대 글자 수", min_value=1000, max_value=30000, value=10000, step=1000)
+max_chars_multilingual = st.slider("다국어 텍스트 최대 글자 수 (한국어/일본어/중국어/영어)", min_value=1000, max_value=30000, value=15000, step=1000)
 
 
 # 플로팅 엘리먼트
@@ -349,7 +351,7 @@ with st.container():
     
     user_text = st.text_area(
         "",
-        placeholder="여기에 분석할 텍스트를 입력하세요... (스마트 분석 엔진이 자동으로 스크립트 부분을 감지합니다)",
+        placeholder="여기에 분석할 텍스트를 입력하세요... (한국어, 일본어, 중국어, 영어 등 다국어 지원, 스마트 분석 엔진이 자동으로 스크립트 부분을 감지합니다)",
         height=350,
         key="input_text"
     )
@@ -401,9 +403,7 @@ with st.container():
                 start = 0
                 length = len(text)
                 while start < length:
-                    segment = text[start:start+max_chars_english]
-                    if re.search(r"[가-힣\u4e00-\u9fff\u3040-\u309F\u30A0-\u30FF]", segment):
-                        segment = text[start:start+max_chars_non_english]
+                    segment = text[start:start+max_chars_multilingual]
                     chunks.append(segment)
                     start += len(segment)
                 return chunks
