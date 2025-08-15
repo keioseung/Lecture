@@ -417,6 +417,22 @@ with st.container():
                 <p style="color: #64748b; margin-bottom: 1.5rem;">AI가 식별한 스크립트 내용입니다.</p>
             """, unsafe_allow_html=True)
 
+            # 통합 프롬프트 입력 (모든 분할본에 기본 적용)
+            st.markdown("""
+            <div class="feature-card">
+                <div class="section-title">🔧 통합 프롬프트 설정</div>
+                <p style="color: #64748b; margin-bottom: 1rem;">모든 스크립트 부분에 적용할 기본 프롬프트를 입력하세요. 개별 부분에서 수정 가능합니다.</p>
+            """, unsafe_allow_html=True)
+            
+            unified_prompt = st.text_input(
+                "🔧 모든 부분에 적용할 기본 프롬프트를 입력하세요",
+                value="아래 내용을 강의 형태로",
+                key="unified_prompt",
+                help="이 프롬프트가 모든 스크립트 부분에 자동으로 적용됩니다. 개별 부분에서 수정 가능합니다."
+            )
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+            
             # 분할된 텍스트 각각 출력
             for i, chunk in enumerate(chunks):
                 st.markdown(f"""
@@ -431,6 +447,29 @@ with st.container():
                     height=250,
                     key=f"chunk_{i}"
                 )
+                
+                # 개별 프롬프트 입력 (통합 프롬프트를 기본값으로 사용)
+                individual_prompt = st.text_input(
+                    f"📝 부분 {i+1} 프롬프트 (수정 가능)",
+                    value=unified_prompt,
+                    key=f"prompt_input_{i}",
+                    help="통합 프롬프트를 기반으로 하되, 필요시 개별 수정 가능합니다"
+                )
+                
+                # ChatGPT 새 창 열기 버튼 (개별 프롬프트 전달)
+                import urllib.parse
+                encoded_prompt = urllib.parse.quote(individual_prompt)
+                chat_url = f"https://chat.openai.com/?q={encoded_prompt}"
+                
+                st.markdown(f"""
+                <a href="{chat_url}" target="_blank" 
+                   style="display:inline-block; text-decoration:none; margin:0.5rem; 
+                          background:linear-gradient(135deg, #10a37f 0%, #0d8a6b 100%); 
+                          width:100%; text-align:center; padding:12px; border-radius:8px; 
+                          font-size:16px; font-weight:600; color:white;">
+                    🔗 ChatGPT 열기 - 부분 {i+1}
+                </a>
+                """, unsafe_allow_html=True)
             
             st.markdown("</div>", unsafe_allow_html=True)
 
